@@ -1,0 +1,190 @@
+#%RAML 1.0
+title: customer-8am-july-api
+
+/insertCustomer:
+  post:
+    body:
+      application/json:
+        example:
+          {
+            "customerId": 101,
+            "customerName": "rama",
+            "email": "rama@gmail.com",
+            "phoneNumber": "45678567",
+            "city": "Hyd"
+          }
+    responses:
+      201:
+        body:
+          application/json:
+            example:
+              {
+                "statusMessage": "Customer details inserted successfully"
+              }
+      400:
+        body:
+          application/json:
+            example:
+              {
+                "statusCode": 400,
+                "statusMessage": "Bad Request"
+              }
+      500:
+        body:
+          application/json:
+            example:
+              {
+                "statusCode": 500,
+                "statusMessage": "Internal Server error"
+              }
+/getCustomers:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example:  
+              [  
+                {
+                  "customerId": 101,
+                  "customerName": "rama",
+                  "email": "rama@gmail.com",
+                  "phoneNumber": "45678567",
+                  "city": "Hyd"
+                },
+                {
+                  "customerId": 102,
+                  "customerName": "krishna",
+                  "email": "rama@gmail.com",
+                  "phoneNumber": "45678567",
+                  "city": "Bang"
+                },
+                {
+                  "customerId": 103,
+                  "customerName": "kali",
+                  "email": "rama@gmail.com",
+                  "phoneNumber": "45678567",
+                  "city": "chennai"
+                }
+                ]
+      400:
+        body:
+          application/json:
+            example:
+              {
+                "statusCode": 400,
+                "statusMessage": "Bad Request"
+              }
+      500:
+        body:
+          application/json:
+            example:
+              {
+                "statusCode": 500,
+                "statusMessage": "Internal Server error"
+              }
+/getCustomerById:
+  get:
+    queryParameters:
+      customerId:
+        type: number
+        required: true
+        example: 102
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              {
+                "customerId": 103,
+                "customerName": "kali",
+                "email": "rama@gmail.com",
+                "phoneNumber": "45678567",
+                "city": "chennai"
+              }
+      400:
+        body:
+          application/json:
+            example:
+              {
+                "statusCode": 400,
+                "statusMessage": "Bad Request"
+              }
+      500:
+        body:
+          application/json:
+            example:
+              {
+                "statusCode": 500,
+                "statusMessage": "Internal Server error"
+              }
+/updateCustomer:
+  put:
+    body:
+      application/json:
+        example:
+          {
+            "customerId": 102,
+            "phoneNumber": "3456788"
+          }
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              {
+                "message": "details updated successfully"
+              }
+      400:
+        body:
+          application/json:
+            example:
+              {
+                "statusCode": 400,
+                "statusMessage": "Bad Request"
+              }
+      500:
+        body:
+          application/json:
+            example:
+              {
+                "statusCode": 500,
+                "statusMessage": "Internal Server error"
+              }
+/deleteCustomer:
+  delete:
+    queryParameters:
+      customerId:
+        type: number
+        required: true
+        example: 103
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              {
+                "messgae": "customer details deleted successfully"
+              }
+/consumeSoap:
+  /{operation}:
+    post:
+      body:
+        application/json:
+          example:
+            {
+             "firstNumber": 10,
+             " secondNumber": 20
+            }
+      responses:
+        201:
+          body:
+            application/json:
+              example:
+    
+             
+    
+          
+      
+
+              

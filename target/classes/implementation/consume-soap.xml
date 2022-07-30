@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="a663a395-ec4b-4f16-bfa3-7919573d287e" >
+		<wsc:connection wsdlLocation="http://www.dneonline.com/calculator.asmx?wsdl" service="Calculator" port="CalculatorSoap" address="http://www.dneonline.com/calculator.asmx" />
+	</wsc:config>
+	<sub-flow name="choice_routerSub_Flow" doc:id="7fc627f7-6212-4a39-b30c-2179855ab5ec" >
+		<ee:transform doc:name="Transform Message" doc:id="c8650415-a124-4f6c-93a1-fc746e9b6ee4">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://tempuri.org/
+---
+{
+	ns0#Add: {
+		ns0#intA: payload.firstNumber default 0,
+		ns0#intB: payload.secondNumber default 0
+	}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+	</sub-flow>
+	<flow name="consume-soap-serviceFlow" doc:id="178b4221-d534-42f9-9917-e26156bc29c5" >
+		<ee:transform doc:name="Transform Message" doc:id="98ece5ef-e3fa-4966-88a4-b4b5619fa6cb" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="operation" ><![CDATA[attributes.uriParams.operation]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="8adaf5f0-9148-493d-a9d9-147863508914" message="#[vars.operation]"/>
+		<choice doc:name="Choice" doc:id="91304cb9-38c2-4326-94c9-434d15c76659" >
+			<when expression="#[vars.operation == 'Add']">
+				<flow-ref doc:name="Flow Reference" doc:id="7b11499f-eaf7-450a-bf12-9efebc71d597" name="choice_routerSub_Flow"/>
+				<wsc:consume doc:id="a2358d3c-ec87-420a-ac50-c4dff0a22ed1" config-ref="Web_Service_Consumer_Config" operation="Add" />
+				<ee:transform doc:name="Transform Message" doc:id="b6029031-e4be-4d87-874d-f83fe13de7b0" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+ns ns0 http://tempuri.org/
+
+output application/json
+---
+{
+	"total": payload.body.ns0#AddResponse.ns0#AddResult
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[vars.operation == 'Subtract']">
+				<flow-ref doc:name="Flow Reference" doc:id="a985a11c-b498-4c4f-868c-75806a58237c" name="choice_routerSub_Flow"/>
+				<wsc:consume doc:name="Consume" doc:id="b4f162ff-340f-4ce6-91f4-feb271ea9c93" config-ref="Web_Service_Consumer_Config" operation="Subtract"/>
+				<ee:transform doc:name="Transform Message" doc:id="fcc65e6e-6451-4a5e-a863-08808037e3e0" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+ns ns0 http://tempuri.org/
+
+output application/json
+---
+{
+	"total": payload.body.ns0#AddResponse.ns0#SubtractResult
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[vars.operation == 'Multiply']">
+			<flow-ref doc:name="Flow Reference" doc:id="163f34a2-efc4-4de3-9ea4-e9c19df72c21" name="choice_routerSub_Flow"/>
+				<wsc:consume doc:name="Consume" doc:id="d1752ac2-f73d-495f-bd48-ec41f4d3cdea" config-ref="Web_Service_Consumer_Config" operation="Multiply"/>
+				<ee:transform doc:name="Transform Message" doc:id="3c52c7e4-ef93-4af6-9780-c25617e23f10" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+ns ns0 http://tempuri.org/
+
+output application/json
+---
+{
+	"total": payload.body.ns0#AddResponse.ns0#MultiplyResult
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[vars.operation == 'Divide']">
+				<flow-ref doc:name="Flow Reference" doc:id="16798592-0c6c-446f-a915-6bbf43c17021" name="choice_routerSub_Flow"/>
+				<wsc:consume doc:name="Consume" doc:id="0b19080c-6a15-4cd6-9671-96a496071a68" config-ref="Web_Service_Consumer_Config" operation="Divide"/>
+				<ee:transform doc:name="Transform Message" doc:id="0594853e-353f-4bd9-8a11-01da597e6a1e" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+ns ns0 http://tempuri.org/
+
+output application/json
+---
+{
+	"total": payload.body.ns0#AddResponse.ns0#DivideResult
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="a9c8ef61-4a85-4ce2-8430-ce33a0990fbd" >
+					<ee:message >
+						<ee:set-payload ><![CDATA["No operation such found"]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>
